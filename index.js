@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -40,6 +40,48 @@ async function run() {
     app.post("/addToys", async (req, res) => {
       const Toys = req.body;
       const result = await AddToysCollection.insertOne(Toys);
+      res.send(result);
+    });
+
+    //MyToys find by Email
+    app.get("/myToys", async (req, res) => {
+      console.log(req.query.email);
+      let query = {};
+      if (req.query?.email) {
+        query = { sellerEmail: req.query.email };
+      }
+      const result = await AddToysCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //Updated part
+    app.patch("/myJobs/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedMyToys = req.body;
+      const myJobs = {
+        $set: {
+          name: updatedMyToys.name,
+          pictureURL: updatedMyToys.pictureURL,
+          sellerName: updatedMyToys.sellerName,
+          sellerEmail: updatedMyToys.sellerEmail,
+          subCategory: updatedMyToys.subCategory,
+          quantity: updatedMyToys.quantity,
+          price: updatedMyToys.price,
+          rating: updatedMyToys.rating,
+          description: updatedMyToys.description,
+        },
+      };
+
+      const result = await AddToysCollection.updateOne(filter, myJobs);
+      res.send(result);
+    });
+
+    //delete part
+    app.delete("/myJobs/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await AddToysCollection.deleteOne(query);
       res.send(result);
     });
 
