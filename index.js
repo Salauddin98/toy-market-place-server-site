@@ -26,6 +26,23 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const AddToysCollection = client.db("ToysProducts").collection("Products");
+
+    //Get the Toys
+    app.get("/allToys", async (req, res) => {
+      const allToys = AddToysCollection.find();
+      const result = await allToys.toArray();
+      res.send(result);
+    });
+
+    //AddToys in the mongoDB
+    app.post("/addToys", async (req, res) => {
+      const Toys = req.body;
+      const result = await AddToysCollection.insertOne(Toys);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
