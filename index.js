@@ -28,12 +28,42 @@ async function run() {
     await client.connect();
 
     const AddToysCollection = client.db("ToysProducts").collection("Products");
+    // Creating index on two fields
+    const indexKeys = { name: 1 }; // Replace field1 and field2 with your actual field names
+    const indexOptions = { name: "toysName" }; // Replace index_name with the desired index name
+    const result = await AddToysCollection.createIndex(indexKeys, indexOptions);
+
+    app.get("/getToysByText/:text", async (req, res) => {
+      const text = req.params.text;
+      const result = await AddToysCollection.find({
+        name: { $regex: text, $options: "i" },
+        // $or: [
+        // { name: { $regex: text, $options: "i" } },
+        // { category: { $regex: text, $options: "i" } },
+        // ],
+      }).toArray();
+      res.send(result);
+    });
 
     //Get the Toys
     app.get("/allToys", async (req, res) => {
       const allToys = AddToysCollection.find();
       const result = await allToys.toArray();
       res.send(result);
+    });
+    app.get("/allToys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await AddToysCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get("/ToysCategory/:category", async (req, res) => {
+      // console.log(req.params._id);
+      const jobs = await AddToysCollection.find({
+        subCategory: req.params.category,
+      }).toArray();
+      res.send(jobs);
     });
 
     //AddToys in the mongoDB
