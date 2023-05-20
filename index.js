@@ -54,8 +54,15 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/myToys/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await AddToysCollection.findOne(query);
+      res.send(result);
+    });
+
     //Updated part
-    app.patch("/myJobs/:id", async (req, res) => {
+    app.patch("/myToys/:id", async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) };
       const updatedMyToys = req.body;
