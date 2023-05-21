@@ -48,7 +48,7 @@ async function run() {
     //Get the Toys
     app.get("/allToys", async (req, res) => {
       const allToys = AddToysCollection.find();
-      const result = await allToys.toArray();
+      const result = await allToys.limit(20).toArray();
       res.send(result);
     });
     app.get("/allToys/:id", async (req, res) => {
