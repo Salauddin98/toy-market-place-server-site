@@ -25,13 +25,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const AddToysCollection = client.db("ToysProducts").collection("Products");
     // Creating index on two fields
-    const indexKeys = { name: 1 }; // Replace field1 and field2 with your actual field names
-    const indexOptions = { name: "toysName" }; // Replace index_name with the desired index name
-    const result = await AddToysCollection.createIndex(indexKeys, indexOptions);
+    // const indexKeys = { name: 1 }; // Replace field1 and field2 with your actual field names
+    // const indexOptions = { name: "toysName" }; // Replace index_name with the desired index name
+    // const result = await AddToysCollection.createIndex(indexKeys, indexOptions);
 
     app.get("/getToysByText/:text", async (req, res) => {
       const text = req.params.text;
@@ -74,15 +74,15 @@ async function run() {
     });
 
     //MyToys find by Email
-    app.get("/myToys", async (req, res) => {
-      console.log(req.query.email);
-      let query = {};
-      if (req.query?.email) {
-        query = { sellerEmail: req.query.email };
-      }
-      const result = await AddToysCollection.find(query).toArray();
-      res.send(result);
-    });
+    // app.get("/myToys", async (req, res) => {
+    //   console.log(req.query.email);
+    //   let query = {};
+    //   if (req.query?.email) {
+    //     query = { sellerEmail: req.query.email };
+    //   }
+    //   const result = await AddToysCollection.find(query).toArray();
+    //   res.send(result);
+    // });
 
     app.get("/myToys/:id", async (req, res) => {
       const id = req.params.id;
@@ -120,6 +120,26 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await AddToysCollection.deleteOne(query);
       res.send(result);
+    });
+
+    //sort
+    app.get("/myToys", async (req, res) => {
+      const { num, email } = req.query;
+
+      console.log(num, email);
+      if (+num === -1 || +num === 1) {
+        const jobs = await AddToysCollection.find({
+          sellerEmail: email,
+        })
+          .sort({ price: +num })
+          .toArray();
+        res.send(jobs);
+      } else {
+        const jobs = await AddToysCollection.find({
+          sellerEmail: email,
+        }).toArray();
+        res.send(jobs);
+      }
     });
 
     // Send a ping to confirm a successful connection
