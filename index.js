@@ -73,17 +73,6 @@ async function run() {
       res.send(result);
     });
 
-    //MyToys find by Email
-    // app.get("/myToys", async (req, res) => {
-    //   console.log(req.query.email);
-    //   let query = {};
-    //   if (req.query?.email) {
-    //     query = { sellerEmail: req.query.email };
-    //   }
-    //   const result = await AddToysCollection.find(query).toArray();
-    //   res.send(result);
-    // });
-
     app.get("/myToys/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
